@@ -1,0 +1,35 @@
+name: Build Windows
+
+# Se lance à chaque envoi de code, et peut aussi être déclenché à la main
+# (onglet Actions -> Build Windows -> Run workflow).
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Configurer (télécharge JUCE automatiquement)
+        run: cmake -B build
+
+      - name: Compiler en Release
+        run: cmake --build build --config Release
+
+      # Le VST3 à installer dans FL Studio
+      - name: Récupérer le VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ombra-VST3-Windows
+          path: build/Ombra_artefacts/Release/VST3/
+
+      # La version autonome (.exe) pour tester sans DAW
+      - name: Récupérer le Standalone
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ombra-Standalone-Windows
+          path: build/Ombra_artefacts/Release/Standalone/Ombra.exe
